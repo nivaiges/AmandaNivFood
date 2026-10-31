@@ -625,7 +625,7 @@
     setPhotoPreview(v.photo || '');
     form.title.classList.remove('invalid');
     $('#save-note').textContent = connected()
-      ? (e && e._local ? 'Saving will publish this entry to the blog.' : 'Saving commits to GitHub — the live site updates in about a minute.')
+      ? (e && e._local ? 'Saving will publish this entry to the blog.' : 'Saving commits to GitHub — the live site updates in a minute or two.')
       : 'Not connected to GitHub — this entry will be saved in this browser only.';
     closeDetail();
     $('#editor').showModal();
@@ -676,7 +676,7 @@
         const toSave = await uploadPhotoIfNeeded(entry);
         await commitEntries((list) => upsert(list, toSave), `${editorState.id && !editorState.isLocal ? 'Update' : 'Add'} review: ${toSave.title}`);
         if (editorState.isLocal) { state.local = state.local.filter((e) => e.id !== entry.id); saveLocal(); }
-        toast('Published! The live site updates in about a minute. 🎉');
+        toast('Published! The live site updates in a minute or two. 🎉');
       } else {
         if (editorState.id && !editorState.isLocal) {
           toast('Published entries can only be changed when connected to GitHub.', true);

@@ -62,9 +62,9 @@ All published entries are in [`data/entries.json`](data/entries.json). You can e
 
 Categories: `Restaurant`, `Home-cooked`, `Café & Bakery`, `Street food`, `Takeout`, `Dessert`, `Drinks`.
 
-## GitHub Pages setup
+## How it's hosted
 
-The site is plain HTML, CSS and JS with no build step. To turn on hosting: **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main` / `(root)` → Save**.
+GitHub Pages serves the site from the `gh-pages` branch. Everything gets committed to `main`, including entries saved from the blog, and the **Publish to GitHub Pages** workflow (`.github/workflows/pages.yml`) copies `main` to `gh-pages` on every push. New entries show up on the live site a minute or two after saving.
 
 ## Running locally
 

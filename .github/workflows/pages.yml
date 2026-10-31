@@ -1,0 +1,27 @@
+# GitHub Pages serves this site from the gh-pages branch.
+# Everything (code and entries saved from the blog) lands on main, so mirror main -> gh-pages on every push.
+name: Publish to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Mirror the latest main to gh-pages
+        run: |
+          git fetch origin main
+          git push --force origin origin/main:refs/heads/gh-pages
