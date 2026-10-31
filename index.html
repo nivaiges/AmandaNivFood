@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Amanda &amp; Niv's Food Blog</title>
+  <meta name="description" content="Amanda and Niv eat their way through the world, one plate at a time — reviews, rankings and honest opinions." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍝</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#" data-action="home">
+        <span class="brand-mark" aria-hidden="true">🍝</span>
+        <span class="brand-text">Amanda <em>&amp;</em> Niv's <span>Food Blog</span></span>
+      </a>
+      <nav class="nav">
+        <a href="#reviews" data-action="home">Reviews</a>
+        <a href="#about">About</a>
+        <button class="btn btn-ghost btn-sm" data-action="settings" title="Sync &amp; settings">
+          <span id="sync-dot" class="sync-dot" aria-hidden="true"></span>
+          <span class="hide-sm">Sync</span>
+        </button>
+        <button class="btn btn-primary btn-sm" data-action="new">+ New entry</button>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <p class="eyebrow">Eat · Rate · Repeat</p>
+      <h1>Amanda <em>&amp;</em> Niv's Food Blog</h1>
+      <p class="tagline">Two forks, one table, zero chill about good food. Every plate we try gets reviewed, scored by both of us, and ranked.</p>
+      <div class="stats" id="stats"></div>
+    </div>
+  </section>
+
+  <main class="wrap" id="reviews">
+    <div id="banner"></div>
+
+    <section class="toolbar" aria-label="Search, filter and sort">
+      <div class="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 3a7.5 7.5 0 0 1 5.96 12.05l4.25 4.24-1.42 1.42-4.24-4.25A7.5 7.5 0 1 1 10.5 3Zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z"/></svg>
+        <input id="q" type="search" placeholder="Search dishes, places, tags…" autocomplete="off" />
+      </div>
+      <label class="select">
+        <span>Category</span>
+        <select id="f-category"><option value="all">All</option></select>
+      </label>
+      <label class="select">
+        <span>Cuisine</span>
+        <select id="f-cuisine"><option value="all">All</option></select>
+      </label>
+      <label class="select">
+        <span>Sort by</span>
+        <select id="sort">
+          <option value="top">Top rated</option>
+          <option value="amanda">Amanda's favorites</option>
+          <option value="niv">Niv's favorites</option>
+          <option value="debate">Most debated</option>
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="price-asc">Price: low → high</option>
+          <option value="price-desc">Price: high → low</option>
+          <option value="az">A → Z</option>
+        </select>
+      </label>
+      <div class="view-toggle" role="group" aria-label="View">
+        <button data-view="grid" class="active" title="Card view" aria-label="Card view">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h8v8H3V3Zm10 0h8v8h-8V3ZM3 13h8v8H3v-8Zm10 0h8v8h-8v-8Z"/></svg>
+        </button>
+        <button data-view="list" title="Ranked list" aria-label="Ranked list">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h2v2H3V5Zm4 0h14v2H7V5ZM3 11h2v2H3v-2Zm4 0h14v2H7v-2Zm-4 6h2v2H3v-2Zm4 0h14v2H7v-2Z"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <p class="result-count" id="result-count"></p>
+    <section id="entries" class="grid" aria-live="polite"></section>
+  </main>
+
+  <section class="about" id="about">
+    <div class="wrap about-inner">
+      <div>
+        <h2>About us</h2>
+        <p>We're Amanda and Niv — a couple who plan trips around restaurants and argue about whether the bread course counts. This is our little corner of the internet where we keep track of everything we eat: the great, the good, and the "never again."</p>
+        <p>Every entry gets two independent scores out of five stars. The overall score is our average, and that's what decides the rankings. When we disagree by a lot, it's officially a <strong>hot debate</strong>. 🔥</p>
+      </div>
+      <div class="legend">
+        <h3>How we score</h3>
+        <ul>
+          <li><span class="stars-static">★★★★★</span> Life-changing. Tell everyone.</li>
+          <li><span class="stars-static">★★★★<i>★</i></span> Excellent. Would happily return.</li>
+          <li><span class="stars-static">★★★<i>★★</i></span> Solid. Good, not legendary.</li>
+          <li><span class="stars-static">★★<i>★★★</i></span> Meh. Wouldn't go out of our way.</li>
+          <li><span class="stars-static">★<i>★★★★</i></span> Nope.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Made with butter, garlic, and strong opinions · Amanda &amp; Niv's Food Blog</p>
+    </div>
+  </footer>
+
+  <!-- Entry detail -->
+  <dialog id="detail" class="modal modal-wide" aria-label="Entry details">
+    <div id="detail-body"></div>
+  </dialog>
+
+  <!-- Editor -->
+  <dialog id="editor" class="modal" aria-labelledby="editor-title">
+    <form id="entry-form" method="dialog" novalidate>
+      <header class="modal-head">
+        <h2 id="editor-title">New entry</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close">✕</button>
+      </header>
+      <div class="modal-scroll">
+        <div class="form-grid">
+          <label class="field span-2">
+            <span>Dish or meal <b>*</b></span>
+            <input name="title" required maxlength="120" placeholder="e.g. Brown-butter gnocchi" />
+          </label>
+          <label class="field">
+            <span>Place</span>
+            <input name="place" maxlength="120" placeholder="Restaurant name, or “Our kitchen”" />
+          </label>
+          <label class="field">
+            <span>Location</span>
+            <input name="location" maxlength="120" placeholder="Neighborhood, city" />
+          </label>
+          <label class="field">
+            <span>Category</span>
+            <select name="category"></select>
+          </label>
+          <label class="field">
+            <span>Cuisine</span>
+            <input name="cuisine" list="cuisine-list" maxlength="60" placeholder="Italian, Thai, Mexican…" />
+            <datalist id="cuisine-list"></datalist>
+          </label>
+          <label class="field">
+            <span>Date</span>
+            <input name="date" type="date" />
+          </label>
+          <div class="field">
+            <span>Price</span>
+            <div class="price-pick" id="price-pick" role="radiogroup" aria-label="Price">
+              <label><input type="radio" name="price" value="0" /><b>–</b></label>
+              <label><input type="radio" name="price" value="1" /><b>$</b></label>
+              <label><input type="radio" name="price" value="2" /><b>$$</b></label>
+              <label><input type="radio" name="price" value="3" /><b>$$$</b></label>
+              <label><input type="radio" name="price" value="4" /><b>$$$$</b></label>
+            </div>
+          </div>
+
+          <div class="field rating-field">
+            <span>Amanda's rating</span>
+            <div class="star-input" data-person="amanda"></div>
+          </div>
+          <div class="field rating-field">
+            <span>Niv's rating</span>
+            <div class="star-input" data-person="niv"></div>
+          </div>
+
+          <label class="field span-2">
+            <span>The verdict <small>(one-liner)</small></span>
+            <input name="verdict" maxlength="160" placeholder="e.g. Worth the 45-minute wait. Order two." />
+          </label>
+          <label class="field span-2">
+            <span>Review</span>
+            <textarea name="review" rows="6" placeholder="What did you eat? What stood out? Blank lines start new paragraphs."></textarea>
+          </label>
+          <label class="field">
+            <span>Must-orders <small>(comma separated)</small></span>
+            <input name="mustOrder" placeholder="Cacio e pepe, tiramisu" />
+          </label>
+          <label class="field">
+            <span>Tags <small>(comma separated)</small></span>
+            <input name="tags" placeholder="date night, brunch, spicy" />
+          </label>
+          <label class="field check span-2">
+            <input type="checkbox" name="wouldReturn" />
+            <span>We'd go back / make it again</span>
+          </label>
+
+          <div class="field span-2">
+            <span>Photo</span>
+            <div class="photo-pick">
+              <div class="photo-preview" id="photo-preview"></div>
+              <div class="photo-controls">
+                <label class="btn btn-ghost btn-sm file-btn">
+                  Upload photo
+                  <input type="file" id="photo-file" accept="image/*" hidden />
+                </label>
+                <input name="photoUrl" type="url" placeholder="…or paste an image URL" />
+                <button type="button" class="btn btn-link btn-sm" id="photo-clear">Remove photo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="modal-foot">
+        <p class="save-note" id="save-note"></p>
+        <div class="foot-actions">
+          <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="save-btn">Save entry</button>
+        </div>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Settings / sync -->
+  <dialog id="settings" class="modal" aria-labelledby="settings-title">
+    <form id="settings-form" method="dialog">
+      <header class="modal-head">
+        <h2 id="settings-title">Sync &amp; settings</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close">✕</button>
+      </header>
+      <div class="modal-scroll">
+        <div id="sync-status" class="sync-status"></div>
+        <p class="help">
+          The blog is a static site on GitHub Pages. To publish entries so they show up for everyone,
+          connect a GitHub token — saving an entry then commits it straight to the repo. Without a token,
+          new entries are saved only in this browser.
+        </p>
+        <details class="howto">
+          <summary>How do I get a token?</summary>
+          <ol>
+            <li>Go to <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub → Settings → Developer settings → Fine-grained tokens → Generate new token</a>.</li>
+            <li>Under <b>Repository access</b>, choose <b>Only select repositories</b> and pick this blog's repo.</li>
+            <li>Under <b>Permissions → Repository permissions</b>, set <b>Contents</b> to <b>Read and write</b>.</li>
+            <li>Generate, copy the token, and paste it below. It's stored only in this browser.</li>
+          </ol>
+        </details>
+        <div class="form-grid">
+          <label class="field span-2">
+            <span>GitHub token</span>
+            <input name="token" type="password" autocomplete="off" placeholder="github_pat_…" />
+          </label>
+          <label class="field">
+            <span>Owner</span>
+            <input name="owner" />
+          </label>
+          <label class="field">
+            <span>Repository</span>
+            <input name="repo" />
+          </label>
+          <label class="field">
+            <span>Branch</span>
+            <input name="branch" />
+          </label>
+        </div>
+        <div class="settings-actions">
+          <button type="button" class="btn btn-primary" id="connect-btn">Save &amp; test connection</button>
+          <button type="button" class="btn btn-ghost" id="disconnect-btn">Disconnect</button>
+        </div>
+        <hr />
+        <h3>Backup</h3>
+        <p class="help">Download every entry (published and local) as JSON, or import a backup into this browser.</p>
+        <div class="settings-actions">
+          <button type="button" class="btn btn-ghost" id="export-btn">Export JSON</button>
+          <label class="btn btn-ghost file-btn">Import JSON<input type="file" id="import-file" accept="application/json,.json" hidden /></label>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
