@@ -11,6 +11,7 @@ Our little corner of the internet for everything we eat. Every plate gets review
 - **Rankings**: every card shows its overall rank (#1, #2, #3 get gold, silver and bronze). The ranked list view numbers entries in whatever order you sort by.
 - **Sort by** top rated, Amanda's favorites, Niv's favorites, most debated, newest, oldest, price, or A→Z
 - **Search and filter** by category and cuisine. Click a tag to see every entry with that tag.
+- **Placeholder food photos**: entries without a photo get a matching stock photo (tacos for tacos, pasta for rigatoni…), labeled “Placeholder photo”, until you upload your own
 - **🔥 Hot debate** badge when our scores are 1.5+ stars apart
 - **Shareable links** to individual entries (`#entry-…`)
 - Works on phones and desktops
@@ -80,4 +81,9 @@ styles.css          the look
 app.js              rendering, sorting/ranking, editor, GitHub sync
 data/entries.json   published entries
 images/             uploaded photos
+images/placeholders stock food photos used until an entry has its own
 ```
+
+## Credits
+
+Placeholder photos are from [Unsplash](https://unsplash.com) and used under the [Unsplash License](https://unsplash.com/license). To swap or add one, drop a JPEG into `images/placeholders/` and add it to `PLACEHOLDERS` in `app.js` with the keywords it should match.

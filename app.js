@@ -28,6 +28,66 @@
     'Dessert': '🍰',
     'Drinks': '🍸',
   };
+  // Stock food photos (Unsplash License) shown until an entry has its own photo.
+  // Matched by keyword against the entry's title, then cuisine, then tags; then by category.
+  const PH_DIR = 'images/placeholders/';
+  const PLACEHOLDERS = [
+    { f: 'pasta-penne', k: ['pasta', 'penne', 'rigatoni', 'spaghetti', 'linguine', 'gnocchi', 'carbonara', 'bolognese', 'lasagna', 'ravioli', 'italian'] },
+    { f: 'pasta-salad', k: ['pasta salad', 'farfalle', 'pesto'] },
+    { f: 'noodles-shrimp', k: ['noodle', 'noodles', 'pad thai', 'lo mein', 'stir fry', 'stir-fry', 'chow mein', 'thai', 'chinese', 'shrimp', 'prawn'] },
+    { f: 'pizza-1', k: ['pizza', 'pizzeria', 'flatbread', 'calzone'] },
+    { f: 'pizza-2', k: ['pizza', 'margherita', 'pepperoni'] },
+    { f: 'burger-1', k: ['burger', 'cheeseburger', 'smash'] },
+    { f: 'burger-2', k: ['burger', 'american', 'diner'] },
+    { f: 'burger-3', k: ['burger', 'sandwich', 'fried egg'] },
+    { f: 'tacos', k: ['taco', 'tacos', 'al pastor', 'barbacoa', 'carnitas', 'birria', 'burrito', 'quesadilla', 'enchilada', 'mexican', 'tex-mex', 'nachos'] },
+    { f: 'ramen', k: ['ramen', 'pho', 'udon', 'soup', 'broth', 'korean'] },
+    { f: 'sushi', k: ['sushi', 'sashimi', 'maki', 'nigiri', 'omakase', 'japanese', 'poke'] },
+    { f: 'salad', k: ['salad', 'greens', 'caesar'] },
+    { f: 'bowl-1', k: ['bowl', 'healthy', 'protein', 'grain'] },
+    { f: 'bowl-2', k: ['vegan', 'vegetarian', 'buddha', 'falafel', 'hummus', 'chickpea'] },
+    { f: 'steak-frites', k: ['steak', 'frites', 'fries', 'beef', 'steakhouse', 'french', 'bistro', 'tasting menu', 'anniversary'] },
+    { f: 'bbq-ribs', k: ['bbq', 'barbecue', 'ribs', 'brisket', 'smoked', 'pulled pork', 'southern'] },
+    { f: 'grill-skewers', k: ['kebab', 'kabob', 'skewer', 'shawarma', 'grill', 'grilled', 'chicken', 'middle eastern', 'mediterranean', 'turkish', 'greek', 'persian', 'israeli'] },
+    { f: 'eggs-avocado', k: ['shakshuka', 'eggs', 'egg', 'avocado', 'toast', 'brunch', 'breakfast', 'benedict', 'omelette'] },
+    { f: 'pancakes', k: ['pancake', 'pancakes', 'waffle', 'waffles', 'french toast', 'crepe'] },
+    { f: 'coffee', k: ['coffee', 'latte', 'espresso', 'cappuccino', 'café', 'cafe', 'matcha', 'tea'] },
+    { f: 'bread', k: ['bread', 'sourdough', 'bakery', 'baguette', 'croissant', 'pastry', 'challah', 'bagel'] },
+    { f: 'donuts', k: ['donut', 'donuts', 'doughnut', 'sprinkles'] },
+    { f: 'cake', k: ['cake', 'cheesecake', 'birthday', 'tart', 'pie'] },
+    { f: 'parfait', k: ['dessert', 'parfait', 'pudding', 'panna cotta', 'mousse', 'ice cream', 'gelato', 'yogurt', 'sweet', 'soufflé', 'souffle'] },
+    { f: 'cocktail', k: ['cocktail', 'cocktails', 'drink', 'drinks', 'bar', 'whiskey', 'old fashioned', 'negroni', 'wine', 'beer', 'margarita'] },
+    { f: 'samosas', k: ['samosa', 'indian', 'curry', 'butter chicken', 'biryani', 'naan', 'tikka', 'masala', 'dumpling', 'dumplings', 'empanada', 'pakistani', 'nepali'] },
+    { f: 'feast', k: ['feast', 'dinner', 'restaurant'] },
+  ];
+  const PH_BY_CATEGORY = {
+    'Restaurant': ['feast', 'steak-frites', 'pasta-penne', 'sushi'],
+    'Home-cooked': ['pasta-penne', 'eggs-avocado', 'bowl-2', 'noodles-shrimp'],
+    'Café & Bakery': ['coffee', 'bread', 'pancakes'],
+    'Street food': ['tacos', 'grill-skewers', 'samosas'],
+    'Takeout': ['pizza-1', 'burger-1', 'noodles-shrimp'],
+    'Dessert': ['cake', 'donuts', 'parfait'],
+    'Drinks': ['cocktail', 'coffee'],
+  };
+  const kwRegex = new Map();
+  function hasKeyword(text, kw) {
+    if (!kwRegex.has(kw)) kwRegex.set(kw, new RegExp(`(^|[^\\p{L}])${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\p{L}])`, 'iu'));
+    return kwRegex.get(kw).test(text);
+  }
+  function placeholderFor(e) {
+    const fields = [e.title, e.cuisine, [...(e.tags || []), ...(e.mustOrder || [])].join(' ')];
+    let pool = [];
+    for (const text of fields) {
+      if (!text) continue;
+      // score each photo by its longest matching keyword, so "butter chicken" beats "chicken"
+      const scored = PLACEHOLDERS.map((p) => [p.f, Math.max(0, ...p.k.filter((kw) => hasKeyword(text, kw)).map((kw) => kw.length))]);
+      const best = Math.max(...scored.map(([, n]) => n));
+      if (best > 0) { pool = scored.filter(([, n]) => n === best).map(([f]) => f); break; }
+    }
+    if (!pool.length) pool = PH_BY_CATEGORY[e.category] || PLACEHOLDERS.map((p) => p.f);
+    return PH_DIR + pool[hash(e.id || e.title) % pool.length] + '.jpg';
+  }
+
   const PALETTES = [
     ['#f6d7b8', '#eab38f'], ['#f3e1a9', '#e3b85a'], ['#dfe8cf', '#a9c18f'],
     ['#f5c9c0', '#e08f7e'], ['#d6e4ee', '#9cbad1'], ['#ead7ee', '#c3a0cb'],
@@ -104,12 +164,14 @@
     if (/^[\w\-./]+$/.test(s) && !s.includes('..')) return s; // relative path inside the repo
     return '';
   }
-  function mediaHTML(e, emojiSize) {
-    const src = safePhoto(e.photo);
+  function mediaHTML(e, emojiSize, labelPlaceholder = false) {
+    const own = safePhoto(e.photo);
+    const src = own || placeholderFor(e);
     const [c1, c2] = PALETTES[hash(e.cuisine || e.category || e.title) % PALETTES.length];
     const ph = `<div class="placeholder" style="--ph1:${c1};--ph2:${c2};${emojiSize ? `font-size:${emojiSize}px` : ''}">${CATEGORIES[e.category] || '🍽️'}</div>`;
     if (!src) return ph;
-    return `<img src="${esc(src)}" alt="${esc(e.title)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'placeholder',textContent:'${CATEGORIES[e.category] || '🍽️'}'}))" />`;
+    const tag = !own && labelPlaceholder ? '<span class="ph-label" title="Stock photo until you add your own">Placeholder photo</span>' : '';
+    return `<img src="${esc(src)}" alt="${own ? esc(e.title) : ''}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'placeholder',textContent:'${CATEGORIES[e.category] || '🍽️'}'}))" />${tag}`;
   }
 
   let toastTimer;
@@ -385,7 +447,7 @@
     return `
       <article class="card" tabindex="0" data-open="${esc(e.id)}" style="animation-delay:${Math.min(i, 12) * 30}ms">
         <div class="card-media">
-          ${mediaHTML(e)}
+          ${mediaHTML(e, 0, true)}
           ${rank ? `<span class="rank-badge${rankClass(rank)}">#${rank}</span>` : ''}
           ${chips ? `<div class="chip-row">${chips}</div>` : ''}
         </div>
@@ -440,7 +502,7 @@
     const meta = [e.category && `${CATEGORIES[e.category] || ''} ${e.category}`, e.cuisine, priceStr(e.price), fmtDate(e.date)].filter(Boolean);
     $('#detail-body').innerHTML = `
       <div class="detail-hero">
-        ${mediaHTML(e, 110)}
+        ${mediaHTML(e, 110, true)}
         <button class="icon-btn" data-close aria-label="Close">✕</button>
         ${rank ? `<span class="rank-badge${rankClass(rank)}">#${rank} overall</span>` : ''}
       </div>
@@ -532,7 +594,7 @@
   function setPhotoPreview(src) {
     editorState.photo = src || '';
     const shown = safePhoto(src);
-    $('#photo-preview').innerHTML = shown ? `<img src="${esc(shown)}" alt="Preview" />` : 'No photo';
+    $('#photo-preview').innerHTML = shown ? `<img src="${esc(shown)}" alt="Preview" />` : '<span>No photo yet —<br>we\'ll show a<br>placeholder</span>';
     $('#photo-clear').hidden = !src;
   }
 
