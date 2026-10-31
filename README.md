@@ -82,8 +82,9 @@ app.js              rendering, sorting/ranking, editor, GitHub sync
 data/entries.json   published entries
 images/             uploaded photos
 images/placeholders stock food photos used until an entry has its own
+images/hero.jpg     header backdrop photo
 ```
 
 ## Credits
 
-Placeholder photos are from [Unsplash](https://unsplash.com) and used under the [Unsplash License](https://unsplash.com/license). To swap or add one, drop a JPEG into `images/placeholders/` and add it to `PLACEHOLDERS` in `app.js` with the keywords it should match.
+The header backdrop and placeholder photos are from [Unsplash](https://unsplash.com) and used under the [Unsplash License](https://unsplash.com/license). To swap or add one, drop a JPEG into `images/placeholders/` and add it to `PLACEHOLDERS` in `app.js` with the keywords it should match.
