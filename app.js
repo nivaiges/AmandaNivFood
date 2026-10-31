@@ -33,6 +33,16 @@
     ['#f5c9c0', '#e08f7e'], ['#d6e4ee', '#9cbad1'], ['#ead7ee', '#c3a0cb'],
   ];
 
+  // Storage and history can throw (private browsing, sandboxed frames) — never let that break the page.
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); return true; } catch { return false; } },
+    remove(k) { try { localStorage.removeItem(k); } catch { /* ignore */ } },
+  };
+  function setHash(h, replace = false) {
+    try { history[replace ? 'replaceState' : 'pushState'](null, '', h || location.pathname + location.search); } catch { /* ignore */ }
+  }
+
   // ---------------------------------------------------------------- state
   const state = {
     published: [],
@@ -40,8 +50,8 @@
     q: '',
     category: 'all',
     cuisine: 'all',
-    sort: localStorage.getItem(LS.sort) || 'top',
-    view: localStorage.getItem(LS.view) || 'grid',
+    sort: store.get(LS.sort) || 'top',
+    view: store.get(LS.view) || 'grid',
     loaded: false,
   };
   const photoCache = new Map(); // repo path -> data URL, so freshly uploaded photos show before Pages redeploys
@@ -51,16 +61,12 @@
 
   // ---------------------------------------------------------------- utils
   function loadJSON(key, fallback) {
-    try { const v = JSON.parse(localStorage.getItem(key)); return v ?? fallback; } catch { return fallback; }
+    try { const v = JSON.parse(store.get(key)); return v ?? fallback; } catch { return fallback; }
   }
   function saveLocal() {
-    try {
-      localStorage.setItem(LS.local, JSON.stringify(state.local));
-      return true;
-    } catch {
-      toast('This browser is out of storage — connect GitHub to publish entries, or use smaller photos.', true);
-      return false;
-    }
+    if (store.set(LS.local, JSON.stringify(state.local))) return true;
+    toast('Couldn\'t save in this browser (storage full or blocked) — connect GitHub to publish instead.', true);
+    return false;
   }
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -469,7 +475,7 @@
     const dlg = $('#detail');
     if (!dlg.open) dlg.showModal();
     $('.detail-content', dlg).scrollTop = 0;
-    if (push && location.hash !== `#entry=${id}`) history.pushState(null, '', `#entry=${encodeURIComponent(id)}`);
+    if (push && location.hash !== `#entry-${id}`) setHash(`#entry-${encodeURIComponent(id)}`);
   }
 
   function closeDetail() {
@@ -643,7 +649,7 @@
   async function deleteEntry(id) {
     const e = findEntry(id);
     if (!e) return;
-    if (!confirm(`Delete “${e.title}”? This can't be undone.`)) return;
+    if (!(await confirmDialog(`Delete “${e.title}”?`, 'This can\'t be undone.', 'Delete'))) return;
     try {
       if (e._local) {
         state.local = state.local.filter((x) => x.id !== id);
@@ -653,7 +659,7 @@
         await commitEntries((list) => list.filter((x) => x.id !== id), `Delete review: ${e.title}`);
       }
       closeDetail();
-      history.replaceState(null, '', location.pathname + location.search);
+      setHash('', true);
       render();
       toast('Entry deleted.');
     } catch (err) {
@@ -698,6 +704,17 @@
     });
   }
 
+  /** In-page replacement for window.confirm (which sandboxed frames block). */
+  function confirmDialog(title, body, okLabel = 'OK') {
+    const dlg = $('#confirm');
+    $('#confirm-title').textContent = title;
+    $('#confirm-body').textContent = body;
+    $('#confirm-ok').textContent = okLabel;
+    dlg.returnValue = '';
+    dlg.showModal();
+    return new Promise((resolve) => dlg.addEventListener('close', () => resolve(dlg.returnValue === 'ok'), { once: true }));
+  }
+
   // ---------------------------------------------------------------- settings
   function openSettings() {
     const s = ghSettings();
@@ -728,8 +745,8 @@
       branch: f.branch.value.trim() || DEFAULT_REPO.branch,
     };
     if (!next.token) { toast('Paste a GitHub token first.', true); return; }
-    const prev = localStorage.getItem(LS.gh);
-    localStorage.setItem(LS.gh, JSON.stringify(next));
+    const prev = store.get(LS.gh);
+    if (!store.set(LS.gh, JSON.stringify(next))) { toast('This browser blocks local storage, so the token can\'t be saved here.', true); return; }
     const btn = $('#connect-btn');
     btn.disabled = true;
     btn.textContent = 'Testing…';
@@ -740,7 +757,7 @@
       render();
       toast('Connected to GitHub! ✓');
     } catch (e) {
-      if (prev) localStorage.setItem(LS.gh, prev); else localStorage.removeItem(LS.gh);
+      if (prev) store.set(LS.gh, prev); else store.remove(LS.gh);
       renderSyncStatus(`✗ ${e.status === 401 ? 'That token was rejected — check it was copied correctly.' : e.status === 404 ? 'Repo or branch not found (or the token has no access to it).' : e.message}`);
       $('#sync-status').className = 'sync-status off';
     } finally {
@@ -751,7 +768,7 @@
   }
 
   function disconnect() {
-    localStorage.removeItem(LS.gh);
+    store.remove(LS.gh);
     $('#settings-form').token.value = '';
     renderSyncStatus();
     render();
@@ -788,7 +805,7 @@
       if (!t) return;
       if (t.dataset.open) return openDetail(t.dataset.open);
       if (t.hasAttribute('data-close')) { t.closest('dialog')?.close(); return; }
-      if (t.dataset.view) { state.view = t.dataset.view; localStorage.setItem(LS.view, state.view); return render(); }
+      if (t.dataset.view) { state.view = t.dataset.view; store.set(LS.view, state.view); return render(); }
       if (t.dataset.tag) {
         closeDetail();
         state.q = t.dataset.tag; $('#q').value = state.q; render();
@@ -805,8 +822,8 @@
         case 'clear-filters':
           state.q = ''; state.category = 'all'; state.cuisine = 'all'; $('#q').value = ''; return render();
         case 'share': {
-          const url = `${location.origin}${location.pathname}#entry=${encodeURIComponent(id)}`;
-          navigator.clipboard?.writeText(url).then(() => toast('Link copied!'), () => prompt('Copy this link:', url));
+          const url = `${location.origin}${location.pathname}#entry-${encodeURIComponent(id)}`;
+          Promise.resolve(navigator.clipboard?.writeText(url)).then(() => toast('Link copied!'), () => toast(url));
           return;
         }
         case 'home':
@@ -823,14 +840,14 @@
     // click on backdrop closes dialogs
     $$('dialog').forEach((d) => d.addEventListener('click', (ev) => { if (ev.target === d) d.close(); }));
     $('#detail').addEventListener('close', () => {
-      if (location.hash.startsWith('#entry=')) history.replaceState(null, '', location.pathname + location.search);
+      if (location.hash.startsWith('#entry')) setHash('', true);
     });
 
     let qTimer;
     $('#q').addEventListener('input', (ev) => { clearTimeout(qTimer); qTimer = setTimeout(() => { state.q = ev.target.value; renderEntries(allEntries()); }, 120); });
     $('#f-category').addEventListener('change', (ev) => { state.category = ev.target.value; renderEntries(allEntries()); });
     $('#f-cuisine').addEventListener('change', (ev) => { state.cuisine = ev.target.value; renderEntries(allEntries()); });
-    $('#sort').addEventListener('change', (ev) => { state.sort = ev.target.value; localStorage.setItem(LS.sort, state.sort); renderEntries(allEntries()); });
+    $('#sort').addEventListener('change', (ev) => { state.sort = ev.target.value; store.set(LS.sort, state.sort); renderEntries(allEntries()); });
 
     form.addEventListener('submit', saveEntry);
     form.title.addEventListener('input', () => form.title.classList.remove('invalid'));
@@ -863,7 +880,7 @@
   }
 
   function routeFromHash() {
-    const m = location.hash.match(/^#entry=(.+)$/);
+    const m = location.hash.match(/^#entry[-=](.+)$/); // '=' kept for old links
     if (m) openDetail(decodeURIComponent(m[1]), false);
     else closeDetail();
   }

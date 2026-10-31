@@ -271,6 +271,22 @@
     </form>
   </dialog>
 
+  <!-- Confirm -->
+  <dialog id="confirm" class="modal modal-sm" aria-labelledby="confirm-title">
+    <form method="dialog">
+      <div class="modal-scroll">
+        <h2 id="confirm-title" class="confirm-title"></h2>
+        <p id="confirm-body" class="help"></p>
+      </div>
+      <footer class="modal-foot">
+        <div class="foot-actions">
+          <button class="btn btn-ghost" value="cancel">Cancel</button>
+          <button class="btn btn-primary btn-danger-solid" value="ok" id="confirm-ok">OK</button>
+        </div>
+      </footer>
+    </form>
+  </dialog>
+
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="app.js"></script>

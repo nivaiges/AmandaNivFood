@@ -12,7 +12,7 @@ Our little corner of the internet for everything we eat. Every plate gets review
 - **Sort by** top rated, Amanda's favorites, Niv's favorites, most debated, newest, oldest, price, or A→Z
 - **Search and filter** by category and cuisine. Click a tag to see every entry with that tag.
 - **🔥 Hot debate** badge when our scores are 1.5+ stars apart
-- **Shareable links** to individual entries (`#entry=…`)
+- **Shareable links** to individual entries (`#entry-…`)
 - Works on phones and desktops
 
 ## Adding entries
