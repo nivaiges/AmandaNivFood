@@ -10,35 +10,62 @@
       "cuisine": "Middle Eastern",
       "date": "2026-10-18",
       "price": 1,
-      "ratings": { "amanda": 4.5, "niv": 5 },
+      "ratings": {
+        "amanda": 4.5,
+        "niv": 5
+      },
       "verdict": "The reason we own a cast-iron pan.",
       "review": "Slow-cooked tomatoes, a frankly irresponsible amount of cumin and smoked paprika, and eggs pulled the second the whites set. Crumbled feta and a fistful of cilantro on top.\n\nNiv insists on mopping it up with challah; Amanda is team sourdough. Both are correct. Next time: add roasted red peppers and make double.",
-      "mustOrder": ["Extra feta", "Toasted challah for dipping"],
-      "tags": ["brunch", "vegetarian", "weekend"],
+      "mustOrder": [
+        "Extra feta",
+        "Toasted challah for dipping"
+      ],
+      "tags": [
+        "brunch",
+        "vegetarian",
+        "weekend"
+      ],
       "wouldReturn": true,
       "photo": "",
       "createdAt": "2026-10-18T11:00:00.000Z",
-      "updatedAt": "2026-10-18T11:00:00.000Z"
+      "updatedAt": "2026-10-18T11:00:00.000Z",
+      "shared": true
     },
     {
       "id": "sample-tacos",
       "sample": true,
-      "title": "Tacos al Pastor",
+      "title": "Taco Truck Night",
       "place": "The corner taco truck",
       "location": "Downtown",
       "category": "Street food",
       "cuisine": "Mexican",
       "date": "2026-10-10",
       "price": 1,
-      "ratings": { "amanda": 4, "niv": 4.5 },
-      "verdict": "Three tacos, eight dollars, zero regrets.",
-      "review": "Shaved straight off the trompo with a sliver of pineapple caught mid-air. The tortillas are pressed to order and the salsa verde has real heat.\n\nThe line is long after 10pm, but it moves fast. Grab extra napkins — you will need them.",
-      "mustOrder": ["Al pastor", "Horchata"],
-      "tags": ["late night", "cheap eats", "spicy"],
+      "ratings": {
+        "amanda": 4,
+        "niv": 4.5
+      },
+      "verdict": "Two orders, eight dollars each, zero regrets.",
+      "review": "Amanda went classic: al pastor shaved straight off the trompo with a sliver of pineapple caught mid-air. Niv got the birria, dunked in a cup of rich consommé until the tortillas went soft and red.\n\nThe tortillas are pressed to order and the salsa verde has real heat. The line is long after 10pm, but it moves fast. Grab extra napkins — you will need them.",
+      "mustOrder": [
+        "Al pastor",
+        "Birria with consommé",
+        "Horchata"
+      ],
+      "tags": [
+        "late night",
+        "cheap eats",
+        "spicy"
+      ],
       "wouldReturn": true,
       "photo": "",
       "createdAt": "2026-10-10T23:00:00.000Z",
-      "updatedAt": "2026-10-10T23:00:00.000Z"
+      "updatedAt": "2026-10-10T23:00:00.000Z",
+      "shared": false,
+      "dishes": {
+        "amanda": "Tacos al pastor",
+        "niv": "Birria tacos with consommé"
+      }
     },
     {
       "id": "sample-tasting-menu",
@@ -50,15 +77,26 @@
       "cuisine": "French",
       "date": "2026-09-27",
       "price": 4,
-      "ratings": { "amanda": 4.5, "niv": 2.5 },
+      "ratings": {
+        "amanda": 4.5,
+        "niv": 2.5
+      },
       "verdict": "Amanda: magical. Niv: still hungry.",
       "review": "Eleven courses, each one prettier than the last. The scallop with brown butter and the tiny chocolate soufflé were genuine highlights.\n\nNiv's review, verbatim: \"The portions were the size of a postage stamp and I stopped for a slice of pizza on the way home.\" This one is officially a hot debate.",
-      "mustOrder": ["Scallop course", "Chocolate soufflé"],
-      "tags": ["date night", "splurge", "anniversary"],
+      "mustOrder": [
+        "Scallop course",
+        "Chocolate soufflé"
+      ],
+      "tags": [
+        "date night",
+        "splurge",
+        "anniversary"
+      ],
       "wouldReturn": false,
       "photo": "",
       "createdAt": "2026-09-27T20:00:00.000Z",
-      "updatedAt": "2026-09-27T20:00:00.000Z"
+      "updatedAt": "2026-09-27T20:00:00.000Z",
+      "shared": true
     }
   ]
 }

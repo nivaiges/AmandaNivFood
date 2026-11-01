@@ -8,11 +8,12 @@ Our little corner of the internet for everything we eat. Every plate gets review
 
 - **Reviews**: dish, place, location, category, cuisine, date, price, a one-line verdict, the full review, must-orders, tags and a photo
 - **Two scores per entry**: Amanda and Niv each rate out of 5 stars (half stars allowed). The overall score is the average of the two.
+- **Shared or separate dishes**: tick “We shared / ordered the same thing” to rate one dish together, or untick it to enter what each of you had and rate your own dish
 - **Rankings**: every card shows its overall rank (#1, #2, #3 get gold, silver and bronze). The ranked list view numbers entries in whatever order you sort by.
 - **Sort by** top rated, Amanda's favorites, Niv's favorites, most debated, newest, oldest, price, or A→Z
 - **Search and filter** by category and cuisine. Click a tag to see every entry with that tag.
 - **Placeholder food photos**: entries without a photo get a matching stock photo (tacos for tacos, pasta for rigatoni…), labeled “Placeholder photo”, until you upload your own
-- **🔥 Hot debate** badge when our scores are 1.5+ stars apart
+- **🔥 Hot debate** badge when our scores for a shared dish are 1.5+ stars apart
 - **Shareable links** to individual entries (`#entry-…`)
 - Works on phones and desktops
 
@@ -43,7 +44,9 @@ All published entries are in [`data/entries.json`](data/entries.json). You can e
 ```json
 {
   "id": "unique-id",
-  "title": "Tacos al Pastor",
+  "title": "Taco Truck Night",
+  "shared": false,
+  "dishes": { "amanda": "Tacos al pastor", "niv": "Birria tacos" },
   "place": "The corner taco truck",
   "location": "Downtown",
   "category": "Street food",
@@ -59,6 +62,8 @@ All published entries are in [`data/entries.json`](data/entries.json). You can e
   "photo": "images/tacos.jpg"
 }
 ```
+
+`shared` defaults to `true` when it's missing; in that case leave out `dishes`, and `title` is the dish you both had. When `shared` is `false`, `dishes` holds what each of you ordered, and each rating is for that person's own dish.
 
 Categories: `Restaurant`, `Home-cooked`, `Café & Bakery`, `Street food`, `Takeout`, `Dessert`, `Drinks`.
 

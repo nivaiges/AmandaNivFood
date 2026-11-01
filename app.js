@@ -75,7 +75,7 @@
     return kwRegex.get(kw).test(text);
   }
   function placeholderFor(e) {
-    const fields = [e.title, e.cuisine, [...(e.tags || []), ...(e.mustOrder || [])].join(' ')];
+    const fields = [e.title, dishList(e).join(' '), e.cuisine, [...(e.tags || []), ...(e.mustOrder || [])].join(' ')];
     let pool = [];
     for (const text of fields) {
       if (!text) continue;
@@ -144,7 +144,14 @@
     const vals = PEOPLE.map((p) => ratingOf(e, p.key)).filter((v) => v != null);
     return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
   }
+  // Shared = we both had (and rated) the same dish. Otherwise each person rates their own dish.
+  // Older entries have no `shared` field and count as shared.
+  const isShared = (e) => e.shared !== false;
+  const dishOf = (e, key) => (!isShared(e) && e.dishes?.[key]) || '';
+  const dishList = (e) => PEOPLE.map((p) => dishOf(e, p.key)).filter(Boolean);
+  // How far apart our scores are — only meaningful when we rated the same dish.
   function spread(e) {
+    if (!isShared(e)) return 0;
     const a = ratingOf(e, 'amanda'), n = ratingOf(e, 'niv');
     return a != null && n != null ? Math.abs(a - n) : 0;
   }
@@ -352,7 +359,7 @@
       .filter((e) => state.cuisine === 'all' || (e.cuisine || '').toLowerCase() === state.cuisine)
       .filter((e) => {
         if (!q) return true;
-        const hay = [e.title, e.place, e.location, e.cuisine, e.category, e.verdict, e.review, ...(e.tags || []), ...(e.mustOrder || [])].join(' ').toLowerCase();
+        const hay = [e.title, ...dishList(e), e.place, e.location, e.cuisine, e.category, e.verdict, e.review, ...(e.tags || []), ...(e.mustOrder || [])].join(' ').toLowerCase();
         return q.split(/\s+/).every((w) => hay.includes(w.replace(/^#/, '')));
       })
       .sort(SORTS[state.sort] || SORTS.top);
@@ -458,10 +465,11 @@
           ${e.place || e.location ? `<p class="place">${e.place ? `<b>${esc(e.place)}</b>` : ''}${e.place && e.location ? ' · ' : ''}${esc(e.location || '')}</p>` : ''}
           ${e.verdict ? `<p class="verdict">“${esc(e.verdict)}”</p>` : ''}
           ${e.date ? `<p class="date">${esc(fmtDate(e.date))}</p>` : ''}
-          <div class="duo">
+          <div class="duo${isShared(e) ? '' : ' separate'}">
             ${PEOPLE.map((p) => {
               const v = ratingOf(e, p.key);
-              return `<div class="duo-item ${p.key}"><span class="who">${p.name}</span><span>${starsHTML(v, 14)} ${v == null ? '<span class="na-text">not rated</span>' : `<span class="num">${fmtScore(v)}</span>`}</span></div>`;
+              const dish = dishOf(e, p.key);
+              return `<div class="duo-item ${p.key}"><span class="who">${p.name}</span>${dish ? `<span class="dish" title="${esc(dish)}">${esc(dish)}</span>` : ''}<span>${starsHTML(v, 14)} ${v == null ? '<span class="na-text">not rated</span>' : `<span class="num">${fmtScore(v)}</span>`}</span></div>`;
             }).join('')}
           </div>
         </div>
@@ -478,6 +486,7 @@
           <div class="meta">${[e.category, e.cuisine, priceStr(e.price)].filter(Boolean).map((m, j) => `<span${j ? ' class="dot"' : ''}>${esc(m)}</span>`).join('')}</div>
           <h3>${esc(e.title)} ${e._local ? '<span class="chip local">This device</span>' : ''}${e.sample ? ' <span class="chip sample">Sample</span>' : ''}</h3>
           <p class="place">${esc([e.place, e.location].filter(Boolean).join(' · '))}</p>
+          ${isShared(e) ? '' : `<p class="row-dishes">${PEOPLE.map((p) => dishOf(e, p.key) && `<span class="${p.key}">${p.name}:</span> ${esc(dishOf(e, p.key))}`).filter(Boolean).join(' · ')}</p>`}
         </div>
         <div class="row-scores">
           ${PEOPLE.map((p) => `<div class="row-person ${p.key}"><b>${fmtScore(ratingOf(e, p.key))}</b>${p.name}</div>`).join('')}
@@ -513,13 +522,15 @@
         <div class="tags" style="margin-top:10px">
           ${e.sample ? '<span class="chip sample">Sample entry</span>' : ''}
           ${e._local ? '<span class="chip local">Saved on this device only</span>' : ''}
+          ${isShared(e) ? '' : '<span class="chip">🍽️ Two dishes</span>'}
           ${e.wouldReturn ? '<span class="chip return">✓ We\'d go back</span>' : ''}
           ${spread(e) >= 1.5 ? '<span class="chip debate">🔥 Hot debate</span>' : ''}
         </div>
         <div class="scorecard">
           ${PEOPLE.map((p) => {
             const v = ratingOf(e, p.key);
-            return `<div class="score-box ${p.key}"><div class="who">${p.name} says</div><div class="big">${fmtScore(v)}</div>${starsHTML(v, 18)}</div>`;
+            const dish = dishOf(e, p.key);
+            return `<div class="score-box ${p.key}"><div class="who">${p.name} ${dish ? 'had' : 'says'}</div>${dish ? `<div class="dish">${esc(dish)}</div>` : ''}<div class="big">${fmtScore(v)}</div>${starsHTML(v, 18)}</div>`;
           }).join('')}
           <div class="score-box overall"><div class="who">Overall</div><div class="big">${fmtScore(o)}</div>${starsHTML(o, 18)}</div>
         </div>
@@ -535,6 +546,7 @@
         </div>
       </div>`;
     const dlg = $('#detail');
+    dlg.dataset.entry = id;
     if (!dlg.open) dlg.showModal();
     $('.detail-content', dlg).scrollTop = 0;
     if (push && location.hash !== `#entry-${id}`) setHash(`#entry-${encodeURIComponent(id)}`);
@@ -606,7 +618,14 @@
     $('#editor-title').textContent = e ? 'Edit entry' : 'New entry';
     $('select[name=category]', form).innerHTML = Object.entries(CATEGORIES).map(([c, em]) => `<option value="${esc(c)}">${em} ${esc(c)}</option>`).join('');
     const v = e || { category: 'Restaurant', date: todayISO(), price: 2, wouldReturn: true };
-    form.title.value = v.title || '';
+    const shared = isShared(v);
+    form.shared.checked = shared;
+    form.dishAmanda.value = dishOf(v, 'amanda');
+    form.dishNiv.value = dishOf(v, 'niv');
+    // an auto-generated "A & N" title stays blank so it follows the dishes if they change
+    const autoTitle = autoTitleFor(form.dishAmanda.value, form.dishNiv.value);
+    form.title.value = !shared && v.title === autoTitle ? '' : v.title || '';
+    syncSharedUI();
     form.place.value = v.place || '';
     form.location.value = v.location || '';
     form.category.value = CATEGORIES[v.category] ? v.category : 'Restaurant';
@@ -623,7 +642,7 @@
     const isUrl = /^https?:\/\//i.test(v.photo || '');
     form.photoUrl.value = isUrl ? v.photo : '';
     setPhotoPreview(v.photo || '');
-    form.title.classList.remove('invalid');
+    $$('.invalid', form).forEach((el) => el.classList.remove('invalid'));
     $('#save-note').textContent = connected()
       ? (e && e._local ? 'Saving will publish this entry to the blog.' : 'Saving commits to GitHub — the live site updates in a minute or two.')
       : 'Not connected to GitHub — this entry will be saved in this browser only.';
@@ -632,14 +651,28 @@
     setTimeout(() => form.title.focus(), 50);
   }
 
+  const autoTitleFor = (a, n) => [a, n].filter(Boolean).join(' & ');
+
+  function syncSharedUI() {
+    const shared = form.shared.checked;
+    form.classList.toggle('is-separate', !shared);
+    $('#title-label').innerHTML = shared ? 'Dish or meal <b>*</b>' : 'Entry title <small>(optional — defaults to both dishes)</small>';
+    form.title.placeholder = shared ? 'e.g. Brown-butter gnocchi' : 'e.g. Date night at Luigi\'s';
+    $$('.rating-label', form).forEach((el, i) => (el.textContent = shared ? `${PEOPLE[i].name}'s rating` : 'Rating'));
+  }
+
   function readForm() {
     const ratings = {};
     $$('.star-input', form).forEach((w) => { const r = w._get(); if (r) ratings[w.dataset.person] = r; });
     const existing = editorState.id ? findEntry(editorState.id) : null;
     const now = new Date().toISOString();
+    const shared = form.shared.checked;
+    const dishes = { amanda: form.dishAmanda.value.trim(), niv: form.dishNiv.value.trim() };
     const entry = {
       id: editorState.id || uid(),
-      title: form.title.value.trim(),
+      title: form.title.value.trim() || (shared ? '' : autoTitleFor(dishes.amanda, dishes.niv)),
+      shared,
+      ...(shared ? {} : { dishes }),
       place: form.place.value.trim(),
       location: form.location.value.trim(),
       category: form.category.value,
@@ -662,10 +695,14 @@
   async function saveEntry(ev) {
     ev.preventDefault();
     const entry = readForm();
-    if (!entry.title) {
-      form.title.classList.add('invalid');
-      form.title.focus();
-      toast('Give the dish a name first.', true);
+    $$('.invalid', form).forEach((el) => el.classList.remove('invalid'));
+    const missing = entry.shared
+      ? (entry.title ? [] : [form.title])
+      : [form.dishAmanda, form.dishNiv].filter((el) => !el.value.trim());
+    if (missing.length) {
+      missing.forEach((el) => el.classList.add('invalid'));
+      missing[0].focus();
+      toast(entry.shared ? 'Give the dish a name first.' : 'Fill in what each of you had.', true);
       return;
     }
     const btn = $('#save-btn');
@@ -901,8 +938,11 @@
 
     // click on backdrop closes dialogs
     $$('dialog').forEach((d) => d.addEventListener('click', (ev) => { if (ev.target === d) d.close(); }));
-    $('#detail').addEventListener('close', () => {
-      if (location.hash.startsWith('#entry')) setHash('', true);
+    // 'close' fires a moment after the dialog shuts; only clear the link if it still points at the
+    // entry that was showing, so navigating straight to another entry isn't undone.
+    $('#detail').addEventListener('close', (ev) => {
+      const shown = ev.target.dataset.entry;
+      if (shown && /^#entry[-=]/.test(location.hash) && decodeURIComponent(location.hash.slice(7)) === shown) setHash('', true);
     });
 
     let qTimer;
@@ -912,7 +952,12 @@
     $('#sort').addEventListener('change', (ev) => { state.sort = ev.target.value; store.set(LS.sort, state.sort); renderEntries(allEntries()); });
 
     form.addEventListener('submit', saveEntry);
-    form.title.addEventListener('input', () => form.title.classList.remove('invalid'));
+    ['title', 'dishAmanda', 'dishNiv'].forEach((n) => form[n].addEventListener('input', () => form[n].classList.remove('invalid')));
+    form.shared.addEventListener('change', () => {
+      // switching back to shared: keep a name by borrowing Amanda's dish if the title is empty
+      if (form.shared.checked && !form.title.value.trim()) form.title.value = form.dishAmanda.value.trim() || form.dishNiv.value.trim();
+      syncSharedUI();
+    });
     $('#photo-file').addEventListener('change', async (ev) => {
       const file = ev.target.files[0];
       ev.target.value = '';

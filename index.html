@@ -123,9 +123,13 @@
       </header>
       <div class="modal-scroll">
         <div class="form-grid">
+          <label class="field check span-2 shared-toggle">
+            <input type="checkbox" name="shared" checked />
+            <span>We shared / ordered the same thing</span>
+          </label>
           <label class="field span-2">
-            <span>Dish or meal <b>*</b></span>
-            <input name="title" required maxlength="120" placeholder="e.g. Brown-butter gnocchi" />
+            <span id="title-label">Dish or meal <b>*</b></span>
+            <input name="title" maxlength="120" placeholder="e.g. Brown-butter gnocchi" />
           </label>
           <label class="field">
             <span>Place</span>
@@ -159,12 +163,20 @@
             </div>
           </div>
 
-          <div class="field rating-field">
-            <span>Amanda's rating</span>
+          <div class="field rating-field person-box amanda">
+            <label class="dish-input">
+              <span>Amanda's dish <b>*</b></span>
+              <input name="dishAmanda" maxlength="120" placeholder="What Amanda had" />
+            </label>
+            <span class="rating-label">Amanda's rating</span>
             <div class="star-input" data-person="amanda"></div>
           </div>
-          <div class="field rating-field">
-            <span>Niv's rating</span>
+          <div class="field rating-field person-box niv">
+            <label class="dish-input">
+              <span>Niv's dish <b>*</b></span>
+              <input name="dishNiv" maxlength="120" placeholder="What Niv had" />
+            </label>
+            <span class="rating-label">Niv's rating</span>
             <div class="star-input" data-person="niv"></div>
           </div>
 

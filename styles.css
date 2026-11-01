@@ -309,6 +309,28 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); backgro
 textarea { resize: vertical; min-height: 120px; }
 .field input.invalid { border-color: #b3261e; box-shadow: 0 0 0 4px rgba(179, 38, 30, .12); }
 
+/* shared vs. separate dishes */
+.shared-toggle { background: var(--cream); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; }
+.person-box .dish-input { display: none; }
+.person-box .rating-label { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.is-separate .person-box {
+  background: var(--cream); border: 1px solid var(--line); border-top: 4px solid var(--amanda);
+  border-radius: 14px; padding: 12px 14px 10px;
+}
+.is-separate .person-box.niv { border-top-color: var(--niv); }
+.is-separate .person-box .dish-input { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+.dish-input > span { font-size: 13px; font-weight: 700; }
+.dish-input > span b { color: var(--accent); }
+.person-box.amanda .dish-input > span { color: var(--amanda); }
+.person-box.niv .dish-input > span { color: var(--niv); }
+.dish-input input { background: #fff; }
+.duo-item .dish { color: var(--ink-2); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.duo-item { min-width: 0; }
+.row-dishes { margin: 2px 0 0; font-size: 13px; color: var(--ink-2); }
+.row-dishes .amanda { color: var(--amanda); font-weight: 700; }
+.row-dishes .niv { color: var(--niv); font-weight: 700; }
+.score-box .dish { font-family: var(--serif); font-size: 17px; font-weight: 600; margin: 2px 0 4px; line-height: 1.25; }
+
 .price-pick { display: flex; gap: 6px; flex-wrap: wrap; }
 .price-pick label { cursor: pointer; }
 .price-pick input { position: absolute; opacity: 0; pointer-events: none; }
